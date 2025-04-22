@@ -1,0 +1,11 @@
+[
+  {
+    "original_issue": "User can't change subscription.",
+    "generated_ticket": "Issue: Subscription Modification\nUser: Subscription Holder\nDevice: Web Browser\nSummary: The user is unable to make changes to their existing subscription plan.",
+    "timestamp": "2025-04-18T00:02:08.799283",
+    "issue_type": "Subscription Modification",
+    "user_type": "Subscription Holder",
+    "device": "Web Browser",
+    "summary": "The user is unable to make changes to their existing subscription plan."
+  }
+]

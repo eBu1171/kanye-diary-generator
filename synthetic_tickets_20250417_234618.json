@@ -1,0 +1,92 @@
+[
+  {
+    "original_issue": "Customer encounters problem with dashboard.",
+    "generated_ticket": "Issue: Dashboard Functionality\nUser: Premium User\nDevice: Web Browser\nSummary: The customer reports that they are unable to access certain features on their dashboard, affecting their ability to track data.",
+    "timestamp": "2025-04-17T23:45:51.883104",
+    "issue_type": "Dashboard Functionality",
+    "user_type": "Premium User",
+    "device": "Web Browser",
+    "summary": "The customer reports that they are unable to access certain features on their dashboard, affecting their ability to track data."
+  },
+  {
+    "original_issue": "content not updating properly.",
+    "generated_ticket": "Issue: Content Not Updating\nUser: Existing Customer\nDevice: Website\nSummary: The user reports that changes made to their content are not reflecting properly on the live site.",
+    "timestamp": "2025-04-17T23:45:55.458530",
+    "issue_type": "Content Not Updating",
+    "user_type": "Existing Customer",
+    "device": "Website",
+    "summary": "The user reports that changes made to their content are not reflecting properly on the live site."
+  },
+  {
+    "original_issue": "App reports during upload.",
+    "generated_ticket": "Issue: Upload Error\nUser: App User\nDevice: Mobile App\nSummary: During the upload process, users experience frequent errors that prevent successful completion.",
+    "timestamp": "2025-04-17T23:45:58.966752",
+    "issue_type": "Upload Error",
+    "user_type": "App User",
+    "device": "Mobile App",
+    "summary": "During the upload process, users experience frequent errors that prevent successful completion."
+  },
+  {
+    "original_issue": "desktop application shows incorrect status.",
+    "generated_ticket": "Issue: Status Display Error\nUser: Desktop Application User\nDevice: Desktop\nSummary: The desktop application is showing incorrect status information for certain items.",
+    "timestamp": "2025-04-17T23:46:00.955344",
+    "issue_type": "Status Display Error",
+    "user_type": "Desktop Application User",
+    "device": "Desktop",
+    "summary": "The desktop application is showing incorrect status information for certain items."
+  },
+  {
+    "original_issue": "account not updating properly.",
+    "generated_ticket": "Issue: Account Update Delay\nUser: Existing Customer\nDevice: Website\nSummary: The user's account data is not reflecting recent changes or updates.",
+    "timestamp": "2025-04-17T23:46:04.395091",
+    "issue_type": "Account Update Delay",
+    "user_type": "Existing Customer",
+    "device": "Website",
+    "summary": "The user's account data is not reflecting recent changes or updates."
+  },
+  {
+    "original_issue": "Error message appears when making a purchase.",
+    "generated_ticket": "Issue: Payment Processing Error\nUser: Customer\nDevice: Website\nSummary: After selecting items for purchase and entering payment information, an error message is displayed preventing the transaction from completing.",
+    "timestamp": "2025-04-17T23:46:07.412868",
+    "issue_type": "Payment Processing Error",
+    "user_type": "Customer",
+    "device": "Website",
+    "summary": "After selecting items for purchase and entering payment information, an error message is displayed preventing the transaction from completing."
+  },
+  {
+    "original_issue": "App reports during login to.",
+    "generated_ticket": "Issue: App Login Failure\nUser: Anonymous\nDevice: Mobile App\nSummary: Users are unable to log in to their accounts using the mobile app.",
+    "timestamp": "2025-04-17T23:46:11.104701",
+    "issue_type": "App Login Failure",
+    "user_type": "Anonymous",
+    "device": "Mobile App",
+    "summary": "Users are unable to log in to their accounts using the mobile app."
+  },
+  {
+    "original_issue": "payment method not connecting properly.",
+    "generated_ticket": "Issue: Payment Gateway Integration\nUser: Returning Customer\nDevice: Website\nSummary: The customer's selected payment method is not properly connecting to process their transaction.",
+    "timestamp": "2025-04-17T23:46:14.419795",
+    "issue_type": "Payment Gateway Integration",
+    "user_type": "Returning Customer",
+    "device": "Website",
+    "summary": "The customer's selected payment method is not properly connecting to process their transaction."
+  },
+  {
+    "original_issue": "subscription not functioning properly.",
+    "generated_ticket": "Issue: Subscription Technical Malfunction\nUser: Premium Subscriber\nDevice: Unknown\nSummary: The user's active subscription is not granting access to premium content or features.",
+    "timestamp": "2025-04-17T23:46:16.258835",
+    "issue_type": "Subscription Technical Malfunction",
+    "user_type": "Premium Subscriber",
+    "device": "Unknown",
+    "summary": "The user's active subscription is not granting access to premium content or features."
+  },
+  {
+    "original_issue": "website shows incorrect information.",
+    "generated_ticket": "Issue: Incorrect Information Display\nUser: Anonymous User\nDevice: Web Browser\nSummary: The website is showing inaccurate information regarding products and services.",
+    "timestamp": "2025-04-17T23:46:18.106596",
+    "issue_type": "Incorrect Information Display",
+    "user_type": "Anonymous User",
+    "device": "Web Browser",
+    "summary": "The website is showing inaccurate information regarding products and services."
+  }
+]

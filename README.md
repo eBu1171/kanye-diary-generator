@@ -39,13 +39,34 @@ SUPABASE_URL=your_supabase_url
 SUPABASE_KEY=your_supabase_key
 ```
 
-### 2. Install Dependencies
+### 2. Twitter OAuth Configuration
+
+For Twitter integration to work, you need to set up a Twitter Developer account and configure OAuth:
+
+1. Go to the [Twitter Developer Portal](https://developer.twitter.com/)
+2. Create a new project and app
+3. Configure User Authentication Settings:
+   - Enable OAuth 2.0
+   - Set the callback URL to match your TWITTER_CALLBACK_URL in .env
+   - For local development: `http://localhost:5001/twitter/callback`
+   - For production: Your deployment URL (e.g., `https://your-app.up.railway.app/twitter/callback`)
+4. Request the following scopes:
+   - `tweet.read`
+   - `tweet.write` 
+   - `users.read`
+   - `offline.access`
+
+**Important**: When deploying to Railway or any other platform, update both:
+- The callback URL in your Twitter Developer Portal
+- The TWITTER_CALLBACK_URL environment variable in your deployment
+
+### 3. Install Dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### 3. Run the Application
+### 4. Run the Application
 
 ```bash
 flask run --port=5001

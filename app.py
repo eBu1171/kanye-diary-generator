@@ -8,6 +8,9 @@ import time
 from apscheduler.schedulers.background import BackgroundScheduler
 import uuid  # For generating unique IDs
 import requests
+import hashlib
+import base64
+from urllib.parse import quote
 
 # Import our generators
 from batch_generate_kanye import generate_entries as generate_kanye
@@ -377,22 +380,33 @@ def twitter_auth():
     state = secrets.token_hex(16)
     session['oauth_state'] = state
     
-    # Create a code challenge (for PKCE)
-    code_verifier = "challenge123456789012345678901234567890"  # Use the same value for challenge and verifier
-    session['code_verifier'] = code_verifier  # Save for callback verification
+    # Create a proper code verifier and challenge for PKCE
+    code_verifier = secrets.token_urlsafe(43)  # Between 43-128 chars per RFC 7636
+    session['code_verifier'] = code_verifier
+    
+    # Save the exact redirect URI in session to ensure it matches exactly in callback
+    session['redirect_uri'] = redirect_uri
+    
+    # Create code challenge by hashing verifier with SHA256 (required by Twitter)
+    code_challenge = hashlib.sha256(code_verifier.encode()).digest()
+    code_challenge = base64.urlsafe_b64encode(code_challenge).decode().rstrip('=')
     
     # Request the specific scopes needed for posting tweets
     scopes = "tweet.read tweet.write users.read offline.access"
+    
+    # Ensure URL parameters are properly encoded
+    encoded_redirect = quote(redirect_uri)
+    encoded_scopes = quote(scopes)
     
     oauth2_url = (
         f"https://twitter.com/i/oauth2/authorize"
         f"?response_type=code"
         f"&client_id={config.TWITTER_CLIENT_ID}"
-        f"&redirect_uri={redirect_uri}"
-        f"&scope={scopes}"
+        f"&redirect_uri={encoded_redirect}"
+        f"&scope={encoded_scopes}"
         f"&state={state}"
-        f"&code_challenge={code_verifier}"
-        f"&code_challenge_method=plain"
+        f"&code_challenge={code_challenge}"
+        f"&code_challenge_method=S256"
     )
     
     print(f"Redirecting to Twitter auth URL: {oauth2_url}")
@@ -401,8 +415,20 @@ def twitter_auth():
 @app.route('/twitter/callback')
 def twitter_callback():
     code = request.args.get('code')
-    if not code:
-        flash("Authentication failed - no code received", "error")
+    state = request.args.get('state')
+    error = request.args.get('error')
+    error_description = request.args.get('error_description')
+    
+    print(f"Twitter callback received: code={code}, state={state}, error={error}, description={error_description}")
+    
+    # If error is present, show it to the user
+    if error:
+        flash(f"Twitter error: {error} - {error_description}", "error")
+        return redirect(url_for('index'))
+    
+    # Verify state to prevent CSRF
+    if not code or state != session.get('oauth_state'):
+        flash("Authentication failed - invalid state or no code received", "error")
         return redirect(url_for('index'))
     
     try:
@@ -410,20 +436,57 @@ def twitter_callback():
         token_url = "https://api.twitter.com/2/oauth2/token"
         
         # Get the code verifier from session
-        code_verifier = session.get('code_verifier', "challenge123456789012345678901234567890")
+        code_verifier = session.get('code_verifier')
+        if not code_verifier:
+            flash("Authentication failed - code verifier missing", "error")
+            return redirect(url_for('index'))
+        
+        # Use the exact same redirect_uri as in the authorization request
+        redirect_uri = session.get('redirect_uri', config.TWITTER_CALLBACK_URL)
         
         payload = {
             'code': code,
             'grant_type': 'authorization_code',
             'client_id': config.TWITTER_CLIENT_ID,
-            'redirect_uri': config.TWITTER_CALLBACK_URL,
-            'code_verifier': code_verifier  # Must match the challenge used in auth
+            'redirect_uri': redirect_uri,
+            'code_verifier': code_verifier
         }
         
-        auth = (config.TWITTER_CLIENT_ID, config.TWITTER_CLIENT_SECRET)
-        token_response = requests.post(token_url, data=payload, auth=auth)
+        # Create basic auth encoded string (Base64 of client_id:client_secret)
+        auth_string = f"{config.TWITTER_CLIENT_ID}:{config.TWITTER_CLIENT_SECRET}"
+        auth_bytes = auth_string.encode('ascii')
+        auth_b64 = base64.b64encode(auth_bytes).decode('ascii')
+        
+        headers = {
+            'Authorization': f'Basic {auth_b64}',
+            'Content-Type': 'application/x-www-form-urlencoded'
+        }
+        
+        # Make the token request with explicit authorization header
+        token_response = requests.post(token_url, data=payload, headers=headers)
         
         print(f"Token response: {token_response.status_code} - {token_response.text}")
+        
+        # If Basic Auth fails, try using client credentials in request body
+        if token_response.status_code != 200:
+            print("Basic Auth approach failed, trying client credentials in request body")
+            body_payload = {
+                'code': code,
+                'grant_type': 'authorization_code',
+                'client_id': config.TWITTER_CLIENT_ID,
+                'client_secret': config.TWITTER_CLIENT_SECRET,
+                'redirect_uri': redirect_uri,
+                'code_verifier': code_verifier
+            }
+            
+            # Make request with credentials in body
+            token_response = requests.post(
+                token_url, 
+                data=body_payload, 
+                headers={'Content-Type': 'application/x-www-form-urlencoded'}
+            )
+            
+            print(f"Second attempt response: {token_response.status_code} - {token_response.text}")
         
         if token_response.status_code != 200:
             flash(f"Failed to get access token: {token_response.text}", "error")
@@ -434,11 +497,14 @@ def twitter_callback():
         
         # Store the complete token data in session
         session['twitter_oauth2_token'] = token_data['access_token']
-        
-        # For debugging - print token info
-        print(f"Access token: {token_data['access_token'][:10]}...")
-        print(f"Token type: {token_data.get('token_type', 'not provided')}")
-        print(f"Expires in: {token_data.get('expires_in', 'not provided')}")
+        # Also save the token type and any other important fields
+        if 'token_type' in token_data:
+            session['twitter_token_type'] = token_data['token_type']
+        if 'refresh_token' in token_data:
+            session['twitter_refresh_token'] = token_data['refresh_token']
+        if 'expires_in' in token_data:
+            session['twitter_token_expires_in'] = token_data['expires_in']
+            session['twitter_token_expires_at'] = (datetime.now() + timedelta(seconds=token_data['expires_in'])).isoformat()
         
         # Get user info using the token
         client = None
